@@ -50,4 +50,4 @@ python -m uvicorn backend.app:app --host 127.0.0.1 --port 8000
 
 ## Статус
 
-Backend, RAG-retrieval, память диалога и чат-виджет протестированы локально сквозным сценарием (реальный аккаунт Yandex AI Studio: embeddings + генерация, реальный FAISS-индекс, браузерный smoke-test). Подготовлен план продакшен-деплоя на VPS (FastAPI за Nginx, systemd, Let's Encrypt) и варианты встраивания виджета в Tilda. Этот репозиторий — код приложения; фактическое состояние конкретного продакшен-окружения им не гарантируется.
+Развёрнуто на VPS: backend работает как systemd-сервис `vassian-faq-assistant.service`, за Nginx-реверс-прокси, HTTPS через Let's Encrypt. Production API: `https://faq.vassian-ai.ru` (`/health` отвечает `200 OK`). Чат-виджет подключён глобально на `https://vassian.ru` и работает.
