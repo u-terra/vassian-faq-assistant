@@ -1,0 +1,16 @@
+.env
+.venv/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+data/*.bin
+data/*.npy
+data/*.db
+reference_teacher_repo/
+
+# Pre-built RAG index is intentionally tracked as part of this finished
+# learning project - override the blanket .bin/.npy exclusion above for
+# exactly these two generated artifacts.
+!data/faiss_index.bin
+!data/faqs_metadata.npy
