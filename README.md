@@ -24,11 +24,13 @@ FAQ/RAG AI-ассистент для личного сайта и портфол
 - набор поведенческих prompt-evaluation сценариев;
 - инструкция по обновлению и переиндексации базы знаний.
 
+Итоговая production-проверка от 15.08.2026: **15/15 контрольных prompt-evaluation сценариев PASS**. Первый live-прогон выявил две ошибки раскрытия system prompt и RAG-контекста; после добавления application-level guard регрессионный набор дал **25 passed**, а повторные production-тесты TC-12 и TC-13 завершились успешно.
+
 ### Документация проекта
 
 - [PROJECT_TZ.md](./PROJECT_TZ.md) — техническое задание коммерческого проекта.
 - [PROMPT_DESIGN.md](./PROMPT_DESIGN.md) — архитектура системного промпта, сценарии, ограничения и few-shot примеры.
-- [PROMPT_TEST_CASES.md](./PROMPT_TEST_CASES.md) — 15 контрольных сценариев для проверки поведения ассистента.
+- [PROMPT_TEST_CASES.md](./PROMPT_TEST_CASES.md) — 15 контрольных сценариев и результаты production-проверки.
 - [KNOWLEDGE_BASE_UPDATE.md](./KNOWLEDGE_BASE_UPDATE.md) — инструкция по актуализации базы знаний и пересборке FAISS-индекса.
 - [PROJECT_PLAN_14_DAYS.md](./PROJECT_PLAN_14_DAYS.md) — ориентировочный 14-дневный план реализации в формате учебного чек-листа.
 - [NEEDS_CONFIRMATION.md](./NEEDS_CONFIRMATION.md) — сведения, которые требуют подтверждения и не должны использоваться как факты.
@@ -50,7 +52,7 @@ https://vassian.ru/ и его подстраницы: `/itap`, `/diploma`, `/con
 - `data/` — база знаний (`about_me.txt`, `services.txt`, `cases/*.txt`, `faqs.json`) + уже собранный индекс (`faiss_index.bin`, `faqs_metadata.npy`).
 - `frontend/` — `widget.html` (локальная демо-страница), `tilda_widget.html` (фрагмент для Tilda-блока), `tilda_head_widget.html` (сайт-wide вставка в `<head>` Tilda, DOM строится JS-ом после загрузки страницы).
 - `tests/` — unit-тесты на fake AI-провайдере, без сети и без реального FAISS-индекса.
-- `reference_teacher_repo/` — учебный референс-код курса промпт-инжиниринга; не используется в продакшене.
+- `reference_teacher_repo/` — учебный референс-код курса промт-инжиниринга; не используется в продакшене.
 
 LangChain намеренно не используется.
 
