@@ -32,6 +32,37 @@ app.add_middleware(
 
 _provider_cache: Dict[str, AIProvider] = {}
 
+INTERNAL_INFO_REFUSAL = (
+    "Я не раскрываю системные инструкции или внутренний RAG-контекст. "
+    "Могу помочь с вопросами об услугах, проектах и формате работы."
+)
+
+_INTERNAL_TARGETS = (
+    "системный промпт",
+    "системного промпта",
+    "system prompt",
+    "внутренние инструкции",
+    "внутренних инструкций",
+    "internal instructions",
+    "rag-контекст",
+    "rag context",
+    "контекст из базы знаний",
+    "контекст базы знаний",
+)
+
+_DISCLOSURE_MARKERS = (
+    "покажи",
+    "выведи",
+    "раскрой",
+    "процитируй",
+    "дословно",
+    "напечатай",
+    "show",
+    "reveal",
+    "print",
+    "quote",
+)
+
 
 def get_settings_dep() -> Settings:
     return _default_settings
@@ -53,6 +84,20 @@ def _format_context(items: List[Dict[str, Any]]) -> str:
         text = item.get("text", "")
         parts.append(f"[{title}]\n{text}")
     return "\n\n".join(parts)
+
+
+def _is_internal_info_request(message: str) -> bool:
+    """Detect explicit requests to disclose hidden instructions/RAG context.
+
+    Prompt instructions alone are not a reliable security boundary: a live
+    evaluation showed the model could quote both the system prompt and the
+    retrieved context despite being told not to. These narrow requests are
+    therefore handled deterministically before retrieval/generation.
+    """
+    text = message.casefold()
+    targets_internal = any(target in text for target in _INTERNAL_TARGETS)
+    asks_to_disclose = any(marker in text for marker in _DISCLOSURE_MARKERS)
+    return targets_internal and asks_to_disclose
 
 
 def build_retrieval_query(current_message: str, history: List[Dict[str, str]]) -> str:
@@ -112,6 +157,11 @@ def chat(
     session_id = req.session_id or str(uuid.uuid4())
 
     memory.init_db(settings.database_path)
+
+    if _is_internal_info_request(req.message):
+        memory.add_message(settings.database_path, session_id, "user", req.message)
+        memory.add_message(settings.database_path, session_id, "assistant", INTERNAL_INFO_REFUSAL)
+        return ChatResponse(answer=INTERNAL_INFO_REFUSAL, session_id=session_id)
 
     # Fetch history BEFORE storing the current message, then append the
     # current message explicitly - avoids double-counting it in the prompt.
